@@ -1,7 +1,16 @@
 module Cuckoo
   class Context
     def initialize
-      @attrs = {}
+      @attrs = {
+        :project  => "",
+        :tags     => [],
+        :date     => nil,
+        :duration => nil,
+        :estimate => nil,
+        :line     => "",
+        :task     => ""
+      }
+      
     end
 
     %w(project tags date duration estimate line task).each do |method|
@@ -12,7 +21,7 @@ module Cuckoo
 
     %w(tags= date= duration= estimate= line= task=).each do |method|
       define_method(method) do |value|
-        @attrs[method.to_sym] = value
+        @attrs[method.chomp('=').to_sym] = value
       end
     end
     

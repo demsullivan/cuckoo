@@ -4,6 +4,8 @@ require "cuckoo/command_input"
 require "cuckoo/context"
 require "readline"
 
+require "pry"
+
 module Cuckoo
   class App
 
@@ -22,9 +24,11 @@ module Cuckoo
           command.execute!
         rescue Exception => e
           puts e.message
-        else
-          @context = command.context
+          next
         end
+        
+        @context = command.context
+        binding.pry
       end
     end
 

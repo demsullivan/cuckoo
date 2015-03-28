@@ -12,6 +12,9 @@ module Cuckoo
     ESTIMATE_PATTERN  = /in [\w+ ]+\?/
     TASK_ID_PATTERN   = /#\d+/
 
+    attr_accessor :context
+    attr_accessor :line
+    
     def initialize(line, context)
       @line    = line
       @context = context
@@ -40,8 +43,8 @@ module Cuckoo
       @context.project = project_token if project_token.length > 0
     end
 
-    def remove_project
-      @line.gsub(@context.project, "")
+    def remove_project(line)
+      line.gsub(@context.project, "")
     end
       
     def identify_tags
@@ -49,9 +52,7 @@ module Cuckoo
       @context.tags = tag_tokens if tag_tokens.length > 0
     end
 
-    def remove_tags
-      line = @line
-      
+    def remove_tags(line)
       @context.tags.each do |tag|
         line.gsub!(tag, "")
       end
@@ -60,6 +61,8 @@ module Cuckoo
     end
 
     def date_index
+      index = nil
+      
       DATE_PATTERNS.each do |pattern|
         index = @line.rindex(pattern)
         break unless index.nil?
@@ -71,8 +74,10 @@ module Cuckoo
     def identify_date
       index = date_index
       return if index.nil?
-      
+
       date_token = @line[index..-1]
+      
+      
       @context.date = Chronic.parse(date_token)
     end
 
@@ -81,12 +86,20 @@ module Cuckoo
       line[0..index-1] unless index.nil?
       line
     end
-    
-    def identify_duration
+
+    def duration_index
+      index = nil
+      
       DURATION_PATTERNS.each do |pattern|
         index = @line.rindex(pattern)
         break unless index.nil?
       end
+
+      index
+    end
+    
+    def identify_duration
+      index = duration_index
 
       return if index.nil?
       
