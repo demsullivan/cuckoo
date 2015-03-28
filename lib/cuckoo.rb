@@ -1,6 +1,6 @@
 require "cuckoo/version"
 require "cuckoo/config"
-#require "cuckoo/parser"
+require "cuckoo/parser"
 
 require "readline"
 
@@ -16,7 +16,10 @@ module Cuckoo
     
     def run!
       while line = Readline.readline('> ', true)
-        p line
+        @current_context = @parser.process(line)
+
+        # identify the command
+        # call the command (skywalker?)
       end
     end
 
@@ -25,12 +28,16 @@ module Cuckoo
     ################################################################################
 
     def load_config_file
-      require File.expand_path("~/.Cuckoofile")      
+      load File.expand_path("~/.Cuckoofile")      
     end
-
    
     def setup_db
-      require 'activerecord'
+      require 'active_record'
+      require 'sqlite3'
+      require 'logger'
+
+      # TODO: make log file configurable
+      ActiveRecord::Base.logger = Logger.new('debug.log')
 
       # load AR models
       Dir.glob('./cuckoo/models/*.rb').each do |file|
@@ -39,8 +46,8 @@ module Cuckoo
 
       # connect to database
       ActiveRecord::Base.establish_connection(
-        :adapter  => Config.config['adapter'],
-        :database => Config.config['database']
+        :adapter  => "sqlite3", #Config.config['adapter'],
+        :database => File.expand_path("~/cuckoo.db"), #Config.config['database']
       )
     end
 
@@ -48,6 +55,12 @@ module Cuckoo
     end
 
     def setup_parser
+      @parser = Parser.new
+      Readline.completion_proc = @parser.complete
+
+      # we want to pass the whole line to the completion method, not just
+      # the last word, so it can understand the context.
+      Readline.completer_word_break_characters = ""
     end
     
     

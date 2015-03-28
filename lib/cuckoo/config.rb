@@ -1,9 +1,16 @@
 module Cuckoo
   class Config
+
+    @@config = {}
+
+    def self.config
+      @@config
+    end
+    
     def self.configure(&block)
       factory = ConfigFactory.new
       factory.instance_eval(&block)
-      self.config = factory.attributes
+      @@config = factory.attributes
     end
   end
 
