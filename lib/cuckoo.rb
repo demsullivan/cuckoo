@@ -1,7 +1,7 @@
 require "cuckoo/version"
 require "cuckoo/config"
-require "cuckoo/parser"
-
+require "cuckoo/command_input"
+require "cuckoo/context"
 require "readline"
 
 module Cuckoo
@@ -11,15 +11,20 @@ module Cuckoo
       load_config_file
       setup_db
       setup_api_connections
-      setup_parser
+      setup_context
     end
     
     def run!
       while line = Readline.readline('> ', true)
-        @current_context = @parser.process(line)
+        command = CommandInput.new(line, @context)
 
-        # identify the command
-        # call the command (skywalker?)
+        begin
+          command.execute!
+        rescue Exception => e
+          puts e.message
+        else
+          @context = command.context
+        end
       end
     end
 
@@ -54,9 +59,9 @@ module Cuckoo
     def setup_api_connections
     end
 
-    def setup_parser
-      @parser = Parser.new
-      Readline.completion_proc = @parser.complete
+    def setup_context
+      @context = Context.new
+      Readline.completion_proc = Completer.new
 
       # we want to pass the whole line to the completion method, not just
       # the last word, so it can understand the context.
