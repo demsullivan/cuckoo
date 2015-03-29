@@ -1,0 +1,7 @@
+module Cuckoo
+  class Tag < PrefixedWord
+    @@prefix  = '#'
+    @@pattern = '[a-zA-Z]+'
+    @@tag     = :tag
+  end
+end

@@ -13,7 +13,12 @@ Gem::Specification.new do |spec|
   spec.description   = "A cuckoo clock."
   spec.homepage      = "https://github.com/demsullivan/cuckoo"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         =
+    Dir['bin/**/*'] +
+    Dir['lib/**/*'] +
+    Dir['spec/**/*'] +
+    ['README.md']
+                   
   spec.bindir        = "bin"
   spec.executables   = ["cko"]
   spec.require_paths = ["lib"]

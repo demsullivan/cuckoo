@@ -1,0 +1,7 @@
+module Cuckoo
+  class TaskId < PrefixedWord
+    @@prefix  = '#'
+    @@pattern = '\d+'
+    @@tag     = :taskid
+  end
+end

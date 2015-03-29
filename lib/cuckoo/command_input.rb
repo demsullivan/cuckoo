@@ -7,35 +7,10 @@ module Cuckoo
 
   DATE_PATTERNS     = [/last [[:alpha:]]+/, /on [[:alpha:]]+/, /at \w+/]
   DURATION_PATTERNS = [/for [a-zA-Z0-9: ]+/, /last \d+/]
+  
 
   
-  class PrefixedWord
-    def self.scan(text)
-      @tokens = text.scan(/#{self.prefix}#{self.pattern}/)
-      return @tokens if @tokens.length > 0
-    end
-  end
-  
-  class Project < PrefixedWord
-    prefix = '@'
-    pattern = '\w+'
-    tag = 'project'
-  end
 
-  class Tag < PrefixedWord
-    prefix = '#'
-    pattern = '[a-zA-Z]+'
-  end
-
-  class TaskId < PrefixedWord
-    prefix = '#'
-    pattern = '\d+'
-  end
-
-  class Estimate < PrefixedWord
-    prefix = 'in '
-    pattern = '[\w+ ]+\?'
-  end
 
   class DateAndDuration
     def self.find_date_index(text)

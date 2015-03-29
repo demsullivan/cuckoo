@@ -1,9 +1,17 @@
 require "cuckoo/version"
 require "cuckoo/config"
-require "cuckoo/command_input"
-require "cuckoo/context"
-require "readline"
 
+require "cuckoo/tags/prefixed_word"
+require "cuckoo/tags/project"
+require "cuckoo/tags/tag"
+require "cuckoo/tags/taskid"
+require "cuckoo/tags/time"
+require "cuckoo/token"
+require "cuckoo/parser"
+
+require "cuckoo/context"
+
+require "readline"
 require "pry"
 
 module Cuckoo

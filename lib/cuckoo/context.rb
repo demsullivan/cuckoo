@@ -8,18 +8,19 @@ module Cuckoo
         :duration => nil,
         :estimate => nil,
         :line     => "",
-        :task     => ""
+        :task     => "",
+        :taskid   => ""
       }
       
     end
 
-    %w(project tags date duration estimate line task).each do |method|
+    %w(project tags date duration estimate line task taskid).each do |method|
       define_method(method) do
         @attrs[method.to_sym]
       end
     end
 
-    %w(tags= date= duration= estimate= line= task=).each do |method|
+    %w(tags= date= duration= estimate= line= task= taskid=).each do |method|
       define_method(method) do |value|
         @attrs[method.chomp('=').to_sym] = value
       end
@@ -30,7 +31,7 @@ module Cuckoo
         raise "You can only specify one project."
       end
 
-      value = value[0] if value.is_a? Array
+      value = value.first if value.is_a? Array
       @attrs[:project] = value
     end
 

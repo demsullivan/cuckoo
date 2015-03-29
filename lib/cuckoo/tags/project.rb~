@@ -1,0 +1,7 @@
+module Cuckoo
+  class Project < PrefixedWord
+    @@prefix  = '@'
+    @@pattern = '\w+'
+    @@tag     = :project
+  end
+end
