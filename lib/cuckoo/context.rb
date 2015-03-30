@@ -1,29 +1,11 @@
 module Cuckoo
   class Context
-    def initialize
-      @attrs = {
-        :project  => "",
-        :tags     => [],
-        :date     => nil,
-        :duration => nil,
-        :estimate => nil,
-        :line     => "",
-        :task     => "",
-        :taskid   => ""
-      }
-      
+    %w(tags date duration estimate task taskid).each do |attr|
+      attr_accessor attr.to_sym
     end
-
-    %w(project tags date duration estimate line task taskid).each do |method|
-      define_method(method) do
-        @attrs[method.to_sym]
-      end
-    end
-
-    %w(tags= date= duration= estimate= line= task= taskid=).each do |method|
-      define_method(method) do |value|
-        @attrs[method.chomp('=').to_sym] = value
-      end
+    
+    def project
+      @project
     end
     
     def project=(value)
@@ -32,8 +14,42 @@ module Cuckoo
       end
 
       value = value.first if value.is_a? Array
-      @attrs[:project] = value
+      @project = value
     end
 
+    def has_project?
+      not @project.nil?
+    end
+
+    def has_tags?
+      not @tags.nil? and @tags.length > 0
+    end
+
+    def has_date?
+      not @date.nil?
+    end
+
+    def has_duration?
+      not @duration.nil?
+    end
+
+    def has_estimate?
+      not @estimate.nil?
+    end
+
+    def has_task?
+      not @task.nil?
+    end
+
+    def has_taskid?
+      not @taskid.nil?
+    end
+    
+    def merge!(other)
+      %w(project tags date duration estimate task taskid).each do |var|
+        instance_variable_set("@#{var}".to_sym, other.send(var.to_sym)) if other.send("has_#{var}?".to_sym)
+      end
+    end
+    
   end
 end

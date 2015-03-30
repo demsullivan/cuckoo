@@ -1,7 +1,7 @@
 module Cuckoo
   class Tag < PrefixedWord
     PREFIX  = '#'
-    PATTERN = '[a-zA-Z]+'
+    PATTERN = '[[:alpha:]]+'
     TAG     = :tags
   end
 end

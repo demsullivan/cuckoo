@@ -9,6 +9,13 @@ require "cuckoo/tags/time"
 require "cuckoo/token"
 require "cuckoo/parser"
 
+require "cuckoo/commands/new_task"
+require "cuckoo/commands/update_task"
+require "cuckoo/commands/status"
+require "cuckoo/commands/stop"
+require "cuckoo/command_input"
+
+require "cuckoo/completer"
 require "cuckoo/context"
 
 require "readline"
@@ -36,7 +43,6 @@ module Cuckoo
         end
         
         @context = command.context
-        binding.pry
       end
     end
 

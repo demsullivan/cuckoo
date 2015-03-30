@@ -51,15 +51,18 @@ module Cuckoo
           end
         end
         
-        if tok.tagged? and tok.tags.include? previous.tags.first
+        if tok.tagged? and (tok.tags.include? previous.tags.first or previous.tags.include? :anchor)
+          current_phrase << previous if previous.tags.include? :anchor and ["yesterday", "today"].include? previous.word
           current_phrase << tok
         end
         previous = tok
       end
 
+      phrases[previous.tags.first] << current_phrase unless current_phrase.empty?
+
       time_matches = []
       phrases[:time].each do |phrase|
-        result = Chronic.parse(tokens_to_string(phrase))
+        result = Chronic.parse(tokens_to_string(phrase), :context => :past)
         phrase.map {|tok| tok.untag } if result.nil?
         time_matches << result unless result.nil?
       end
@@ -78,8 +81,12 @@ module Cuckoo
         estimate_matches << result unless result.nil?
       end
 
+      context.date     = time_matches.first
+      context.duration = duration_matches.first
+      context.estimate = estimate_matches.first
+      
       matches = tokens.select {|t| t.tags.include?(:time) or t.tags.include?(:duration) or t.tags.include?(:estimate) or t.tags.include?(:anchor) }
-      tokens - matches          
+      tokens - matches
     end
 
     def identify_and_remove_task(tokens, context)
