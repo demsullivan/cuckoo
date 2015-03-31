@@ -1,3 +1,9 @@
+require "readline"
+require "thread"
+
+require "pry"
+require "celluloid/autostart"
+
 require "cuckoo/version"
 require "cuckoo/config"
 
@@ -17,33 +23,69 @@ require "cuckoo/command_input"
 
 require "cuckoo/completer"
 require "cuckoo/context"
+require "cuckoo/timer"
 
-require "readline"
-require "pry"
+
+
 
 module Cuckoo
+  class InputActor
+    include Celluloid
+
+    attr_accessor :text, :running
+    
+    def read_input
+      @text = Readline.readline('> ', true)
+    end
+  end
+  
   class App
+    include Celluloid
+    include Celluloid::Notifications
 
     def initialize
       load_config_file
       setup_db
       setup_api_connections
       setup_context
+
+      subscribe "timer_complete", :on_timer_complete
+    end
+
+    def on_timer_complete(topic, data="")
+      Actor.kill(@input)
+      puts ""
+      puts "Timer complete!"
+      @context.timer = nil
     end
     
     def run!
-      while line = Readline.readline('> ', true)
-        command = CommandInput.new(line, @context)
-
+      @input = InputActor.new
+      
+      while 1
         begin
-          command.execute!
-        rescue Exception => e
-          puts e.message
-          next
+          unless @input.running
+            @input.async.read_input
+          end
+          
+          unless @input.text.nil?
+            command = CommandInput.new(@input.text, @context)
+            
+            begin
+              command.execute!
+            rescue Exception => e
+              puts e.message
+              next
+            end
+            
+            @context = command.context
+          end
+        rescue DeadActorError
+          @input = InputActor.new
         end
         
-        @context = command.context
       end
+
     end
 
     ################################################################################
@@ -60,7 +102,7 @@ module Cuckoo
       require 'logger'
 
       # TODO: make log file configurable
-      ActiveRecord::Base.logger = Logger.new('debug.log')
+      ActiveRecord::Base.logger = ::Logger.new('debug.log')
 
       # load AR models
       Dir.glob('./cuckoo/models/*.rb').each do |file|

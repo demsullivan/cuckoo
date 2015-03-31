@@ -4,6 +4,9 @@ require "chronic_duration"
 module Cuckoo
   
   class Parser
+    
+    include Taggers
+    
     def parse(text)
       context = Cuckoo::Context.new
       tokens = tokenize(text)

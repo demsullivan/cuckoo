@@ -1,4 +1,4 @@
-require 'skywalker'
+require 'skywalker/command'
 
 module Cuckoo
   module Commands

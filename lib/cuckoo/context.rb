@@ -1,7 +1,11 @@
 module Cuckoo
   class Context
-    %w(tags date duration estimate task taskid).each do |attr|
+    %w(tags date duration estimate task taskid queue timer).each do |attr|
       attr_accessor attr.to_sym
+    end
+
+    def initialize
+      @queue = Queue.new
     end
     
     def project
@@ -9,7 +13,7 @@ module Cuckoo
     end
     
     def project=(value)
-      unless value.is_a? String or value.length == 1
+      unless value.is_a? String or value.length == 1 or value.nil?
         raise "You can only specify one project."
       end
 

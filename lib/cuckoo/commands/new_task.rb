@@ -4,6 +4,12 @@ module Cuckoo
   module Commands
     class NewTaskCommand < Skywalker::Command
       def execute!
+        unless context.timer.nil?
+          puts "Timer already running."
+        end
+
+        context.timer = Timer.new(2, true)
+          
         puts "create task called '#{context.task}'"
       end
       
