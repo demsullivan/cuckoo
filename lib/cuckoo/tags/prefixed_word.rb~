@@ -1,8 +1,0 @@
-module Cuckoo
-  class PrefixedWord
-    def self.scan(tokens)
-      pattern = /^#{@@prefix}#{@@pattern}$/
-      tokens.each { |tok| token.tag(@@tag) if token.word ~= pattern }
-    end
-  end
-end
