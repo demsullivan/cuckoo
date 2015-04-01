@@ -13,7 +13,7 @@ module Cuckoo
     end
     
     def project=(value)
-      unless value.is_a? String or value.length == 1 or value.nil?
+      unless value.is_a? String or value.length <= 1 or value.nil?
         raise "You can only specify one project."
       end
 

@@ -110,10 +110,8 @@ module Cuckoo
       end
 
       # connect to database
-      ActiveRecord::Base.establish_connection(
-        :adapter  => "sqlite3", #Config.config['adapter'],
-        :database => File.expand_path("~/cuckoo.db"), #Config.config['database']
-      )
+      config = YAML::load(IO.read('config/database.yml'))
+      ActiveRecord::Base.establish_connection(config['development'])
     end
 
     def setup_api_connections

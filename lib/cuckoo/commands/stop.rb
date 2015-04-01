@@ -3,8 +3,10 @@ require 'skywalker/command'
 module Cuckoo
   module Commands
     class StopCommand < Skywalker::Command
+      attr_accessor :update_context
+      
       def execute!
-        puts "stop timer"
+        context.timer.stop unless context.timer.nil?
       end
 
       private def required_args

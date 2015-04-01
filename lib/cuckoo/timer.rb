@@ -13,7 +13,7 @@ module Cuckoo
     end
 
     def start
-      @timer = every 1 { tick }
+      @timer = every(1) { tick }
     end
 
     def pause
