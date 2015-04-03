@@ -31,7 +31,7 @@ module Cuckoo
       
       :new_task       => {
         :cmd        => NewTaskCommand,
-        :conditions => Proc.new {|c| c.has_project? and c.has_task? and not c.has_date? and not c.has_duration? and not c.has_taskid? }
+        :conditions => Proc.new {|c| c.has_project? and (c.has_task? or c.has_taskid?) and not c.has_date? and not c.has_duration? }
       },
       
       :update_task    => {

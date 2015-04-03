@@ -18,31 +18,28 @@ module Cuckoo
 
         @context.timer = Timer.new(3600, true)
 
-        project = Project.where(:code => @cmd_context.project)
+        @context.project = Project.find_or_create_by(:code => @cmd_context.project)
 
-        if project.length == 0
-          project = Project.new(:code => @cmd_context.project)
+        if @cmd_context.has_taskid?
+          @context.task = @context.project.tasks.find(:external_task_id => @cmd_context.task_id)
         else
-          project = project.first
+          @context.task = Task.new(:name => @cmd_context.task, :external_task_id => @cmd_context.taskid,
+                                   :project => project, :estimate_seconds => @cmd_context.estimate)
         end
-
-        @context.project = project
-        @context.task = Task.new(:name => @cmd_context.task, :external_task_id => @cmd_context.taskid,
-                                 :project => project, :estimate_seconds => @cmd_context.estimate)
 
         @context.time_entry = TimeEntry.new(:task => @context.task, :tags => @cmd_context.tags,
                                             :started_at => DateTime.now)
 
         @context.project.save!
-        
         @context.task.save!
-
-        if @cmd_context.taskid.nil?
+        @context.time_entry.save!
+        
+        if @context.task.external_task_id.nil?
           @context.task.external_task_id = @context.task.id.to_s
           @context.task.save!
         end
         
-        @context.time_entry.save!
+
         
         @update_context = true
         
