@@ -1,24 +1,52 @@
-require 'skywalker/command'
-
 module Cuckoo
   module Commands
-    class NewTaskCommand < Skywalker::Command
-      
+    class NewTaskCommand
+
+      include Cuckoo::Models
+
       attr_accessor :update_context
-      
-      def execute!
-        unless context.timer.nil?
+
+      def call(args)
+        @context        = args[:context]
+        @cmd_context    = args[:cmd_context]
+        @update_context = args[:update_context]
+
+        unless @context.timer.nil?
           puts "Timer already running."
           return
         end
 
-        context.timer = Timer.new(3600, true)
-        puts "create task called '#{cmd_context.task}'"
+        @context.timer = Timer.new(3600, true)
+
+        project = Project.where(:code => @cmd_context.project)
+
+        if project.length == 0
+          project = Project.new(:code => @cmd_context.project)
+        else
+          project = project.first
+        end
+
+        @context.project = project
+        @context.task = Task.new(:name => @cmd_context.task, :external_task_id => @cmd_context.taskid,
+                                 :project => project, :estimate_seconds => @cmd_context.estimate)
+
+        @context.time_entry = TimeEntry.new(:task => @context.task, :tags => @cmd_context.tags,
+                                            :started_at => DateTime.now)
+
+        @context.project.save!
+        
+        @context.task.save!
+
+        if @cmd_context.taskid.nil?
+          @context.task.external_task_id = @context.task.id.to_s
+          @context.task.save!
+        end
+        
+        @context.time_entry.save!
+        
         @update_context = true
-      end
-      
-      private def required_args
-        %w(context cmd_context update_context on_success on_failure)
+        
+        puts "create task called '#{@cmd_context.task}'"
       end
     end
   end

@@ -33,7 +33,9 @@ module Cuckoo
 
     def identify_and_remove_simple_tags(tag, tokens, context)
       matches = tokens.select { |t| t.tags.include? tag }
-      context.send "#{tag.to_s}=".to_sym, matches.map {|t| t.word}
+      context.send "#{tag.to_s}=".to_sym, matches.map {|t| t.word} if matches.length > 1
+      context.send "#{tag.to_s}=".to_sym, matches.first.word       if matches.length == 1
+      context.send "#{tag.to_s}=".to_sym, nil                      if matches.length == 0
       tokens - matches
     end
 

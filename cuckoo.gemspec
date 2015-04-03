@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sqlite3",          "~> 1.3.10"
   spec.add_dependency "skywalker"
   spec.add_dependency "celluloid",        "0.16.0"
+  spec.add_dependency "pg"
   
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"

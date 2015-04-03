@@ -1,6 +1,7 @@
 require "bundler/gem_tasks"
 require 'bundler/setup'
 require 'active_record'
+require 'cuckoo'
 
 include ActiveRecord::Tasks
 
@@ -15,6 +16,8 @@ DatabaseTasks.migrations_paths = File.join(db_dir, 'migrate')
 task :environment do
   ActiveRecord::Base.configurations = DatabaseTasks.database_configuration
   ActiveRecord::Base.establish_connection DatabaseTasks.env
+  app = Cuckoo::App.new
+  include Cuckoo::Models
 end
  
 load 'active_record/railties/databases.rake'
@@ -25,3 +28,9 @@ begin
 rescue LoadError
 end
 
+
+task :console => [:environment] do
+  require 'irb'
+  ARGV.clear
+  IRB.start
+end

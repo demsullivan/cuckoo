@@ -1,22 +1,20 @@
-require 'skywalker/command'
-
 module Cuckoo
   module Commands
-    class StatusCommand < Skywalker::Command
+    class StatusCommand
 
       attr_accessor :update_context
-      
-      def execute!
-        unless context.timer.nil?
-          elapsed_string = ChronicDuration.output(context.timer.elapsed, :format => :long)
-          puts "Working on '#{context.project}' '#{context.task}' for #{elapsed_string}."
+
+      def call(args)
+        @context        = args[:context]
+        @cmd_context    = args[:cmd_context]
+        @update_context = args[:update_context]
+
+        unless @context.timer.nil?
+          elapsed_string = ChronicDuration.output(@context.timer.elapsed, :format => :long)
+          puts "Working on '#{@context.project.code}' '#{@context.task.name}' for #{elapsed_string}."
         else
           puts "No timers running."
         end
-      end
-
-      private def required_args
-        %w(context cmd_context update_context on_success on_failure)
       end
     end
   end

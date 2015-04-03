@@ -1,26 +1,24 @@
 module Cuckoo
   class Context
-    %w(tags date duration estimate task taskid queue timer).each do |attr|
+    %w(cmd date project duration estimate task taskid queue timer time_entry).each do |attr|
       attr_accessor attr.to_sym
     end
 
     def initialize
       @queue = Queue.new
+      @tags = []
     end
-    
-    def project
-      @project
-    end
-    
-    def project=(value)
-      unless value.is_a? String or value.length <= 1 or value.nil?
-        raise "You can only specify one project."
+
+    def tags=(val)
+      if val.is_a? String
+        @tags = [val]
       end
-
-      value = value.first if value.is_a? Array
-      @project = value
     end
 
+    def tags
+      @tags
+    end
+    
     def has_project?
       not @project.nil?
     end
@@ -46,12 +44,16 @@ module Cuckoo
     end
 
     def has_taskid?
-      not @taskid.nil?
+      not @taskid.nil? and @taskid.length > 0
+    end
+
+    def has_active_task?
+      not @task.nil? and not @time_entry.nil?
     end
     
     def merge!(other)
       %w(project tags date duration estimate task taskid).each do |var|
-        instance_variable_set("@#{var}".to_sym, other.send(var.to_sym)) if other.send("has_#{var}?".to_sym)
+        instance_variable_set("@#{var}".to_sym, other.send(var)) if other.send("has_#{var}?")
       end
     end
     

@@ -34,7 +34,7 @@ module Cuckoo
     def tick
       @elapsed += 1
 
-      if @elapsed == @duration
+      if not @duration.nil? and @elapsed == @duration
         publish "timer_complete"
         @timer.cancel
       end

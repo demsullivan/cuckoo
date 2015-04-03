@@ -1,17 +1,21 @@
-require 'skywalker/command'
-
 module Cuckoo
   module Commands
-    class StopCommand < Skywalker::Command
+    class StopCommand
+
       attr_accessor :update_context
       
-      def execute!
-        context.timer.stop unless context.timer.nil?
+      def call(args)
+        @context = args[:context]
+
+        unless @context.timer.nil?
+          @context.timer.pause
+
+          @context.time_entry.finished_at = DateTime.now
+          @context.time_entry.save!
+        end
       end
 
-      private def required_args
-        %w(context on_success on_failure)
-      end
+
     end
   end
 end

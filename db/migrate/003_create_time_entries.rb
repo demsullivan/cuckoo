@@ -5,5 +5,6 @@ class CreateTimeEntries < ActiveRecord::Migration
       t.datetime   :finished_at
       t.text       :tags, array: true
       t.belongs_to :task, index: true
+    end
   end
 end

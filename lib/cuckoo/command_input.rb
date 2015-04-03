@@ -4,29 +4,39 @@ module Cuckoo
     include Commands
     
     COMMANDS = {
+      :create         => {
+        :cmd        => CreateCommand,
+        :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'create'}
+      },
+      
       :status         => {
         :cmd        => StatusCommand,
-        :conditions => Proc.new {|t, c| t.split(' ').first.downcase == 'status'}
+        :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'status'}
       },
       
       :stop           => {
         :cmd        => StopCommand,
-        :conditions => Proc.new {|t, c| t.split(' ').first.downcase == 'stop'}
-      },
-            
-      :new_task       => {
-        :cmd        => NewTaskCommand,
-        :conditions => Proc.new {|t, c| c.has_project? and c.has_task? and not c.has_date? and not c.has_duration? and not c.has_taskid? }
+        :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'stop'}
       },
 
-      :update_current => {
-        :cmd        => UpdateTaskCommand,
-        :conditions => Proc.new {|t, c| c.has_date? or c.has_duration? }
+      :add_note       => {
+        :cmd        => AddNoteCommand,
+        :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'note' }
+      },
+
+      :irb            => {
+        :cmd        => IRBCommand,
+        :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'irb' }
+      },
+      
+      :new_task       => {
+        :cmd        => NewTaskCommand,
+        :conditions => Proc.new {|c| c.has_project? and c.has_task? and not c.has_date? and not c.has_duration? and not c.has_taskid? }
       },
       
       :update_task    => {
         :cmd        => UpdateTaskCommand,
-        :conditions => Proc.new {|t, c| c.has_project? and (c.has_task? or c.has_taskid?) and (c.has_date? or c.has_duration?) }
+        :conditions => Proc.new {|c| (c.has_project? and (c.has_task? or c.has_taskid?)) or (c.has_date? or c.has_duration?) }
       }
     }
 
@@ -36,8 +46,9 @@ module Cuckoo
       @line    = line
       @context = context
 
-      @parser     = Parser.new
-      @cmd_context = @parser.parse(@line)
+      @parser          = Parser.new
+      @cmd_context     = @parser.parse(@line)
+      @cmd_context.cmd = @line
     end
 
     def execute!
@@ -45,30 +56,19 @@ module Cuckoo
         :context        => @context,
         :cmd_context    => @cmd_context,
         :update_context => false,
-        :on_success     => method(:on_command_success),
-        :on_failure     => method(:on_command_failure)
       }
 
       COMMANDS.each do |cmd, config|
         condition_check = config[:conditions]
         next if condition_check.nil?
         
-        if condition_check.call @line, @cmd_context
-          config[:cmd].call(args)
+        if condition_check.call @cmd_context
+          config[:cmd].new.call(args)
           break
         end
       end
       
     end
 
-    def on_command_success(command)
-      if command.update_context
-        @context.merge! @cmd_context
-      end
-    end
-
-    def on_command_failure(command)
-      raise command.error
-    end
   end
 end

@@ -3,6 +3,9 @@ require "thread"
 
 require "pry"
 require "celluloid/autostart"
+require "active_record"
+require "pg"
+require "logger"
 
 require "cuckoo/version"
 require "cuckoo/config"
@@ -15,17 +18,23 @@ require "cuckoo/tags/time"
 require "cuckoo/token"
 require "cuckoo/parser"
 
+require "cuckoo/models/project"
+require "cuckoo/models/task"
+require "cuckoo/models/time_entry"
+require "cuckoo/models/note"
+
+require "cuckoo/commands/create"
 require "cuckoo/commands/new_task"
 require "cuckoo/commands/update_task"
 require "cuckoo/commands/status"
 require "cuckoo/commands/stop"
+require "cuckoo/commands/add_note"
+require "cuckoo/commands/irb"
 require "cuckoo/command_input"
 
 require "cuckoo/completer"
 require "cuckoo/context"
 require "cuckoo/timer"
-
-
 
 
 module Cuckoo
@@ -61,15 +70,21 @@ module Cuckoo
     
     def run!
       @input = InputActor.new
+      @break_count = 0
       
       while 1
         begin
           unless @input.running
+            break if @break_count == 2
             @input.async.read_input
+            @break_count += 1 if @input.text.nil?
+            puts "Hit ^D again to exit." if @input.text.nil? and @break_count == 1
           end
+
           
           unless @input.text.nil?
             command = CommandInput.new(@input.text, @context)
+            @break_count = 0
             
             begin
               command.execute!
@@ -86,6 +101,9 @@ module Cuckoo
         
       end
 
+      @input.terminate if @input.running
+      terminate
+      
     end
 
     ################################################################################
@@ -97,17 +115,13 @@ module Cuckoo
     end
    
     def setup_db
-      require 'active_record'
-      require 'sqlite3'
-      require 'logger'
+
 
       # TODO: make log file configurable
       ActiveRecord::Base.logger = ::Logger.new('debug.log')
 
       # load AR models
-      Dir.glob('./cuckoo/models/*.rb').each do |file|
-        require file
-      end
+
 
       # connect to database
       config = YAML::load(IO.read('config/database.yml'))
