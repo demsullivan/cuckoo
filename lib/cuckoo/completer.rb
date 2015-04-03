@@ -28,9 +28,7 @@ module Cuckoo
 
       if subject.tags.include? :project
         complete_project subject.word
-      elsif subject.tags.include? :tags
-        complete_tags subject.word
-      elsif subject.tags.include? :taskid
+      elsif subject.tags.include? :taskid or subject.word == '#'
         complete_task subject.word
       end
     end
@@ -50,7 +48,10 @@ module Cuckoo
 
     def complete_task(word)
       # ["#{@context.project} task", "#{@context.project} task 2"]
-      tasks = Task.joins(:project).where(projects: {code: @context.project}).where("external_task_id LIKE :task_id", {task_id: "#{word[1..-1]}%"}).select("external_task_id", "name")
+      tasks = Task.joins(:project).where(projects: {code: @context.project})  
+      tasks = tasks.where("external_task_id LIKE :task_id", {task_id: "#{word[1..-1]}%"}).
+              select("external_task_id", "name") unless word == '#'
+      
       tasks.map { |t| "#{@before} #{word}#{t.external_task_id[word.length..-1]} #{t.name}" }
     end
     

@@ -44,7 +44,7 @@ module Cuckoo
     attr_accessor :text, :running
     
     def read_input
-      @text = Readline.readline('> ', true)
+      @text = Readline.readline('cko> ', true)
     end
   end
   

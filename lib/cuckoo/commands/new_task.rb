@@ -46,7 +46,7 @@ module Cuckoo
         
         @update_context = true
         
-        puts "create task called '#{@cmd_context.task}'"
+        puts "Created task ##{@context.task.external_task_id} #{@context.task.name} on project #{@context.project.code}."
       end
     end
   end
