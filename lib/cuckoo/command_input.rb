@@ -28,12 +28,14 @@ module Cuckoo
         :cmd        => IRBCommand,
         :conditions => Proc.new {|c| c.cmd.split(' ').first.downcase == 'irb' }
       },
-      
+
+      # start a new task, or begin working on an existing task
       :new_task       => {
         :cmd        => NewTaskCommand,
         :conditions => Proc.new {|c| c.has_project? and (c.has_task? or c.has_taskid?) and not c.has_date? and not c.has_duration? }
       },
-      
+
+      # update the current task, or some other task
       :update_task    => {
         :cmd        => UpdateTaskCommand,
         :conditions => Proc.new {|c| (c.has_project? and (c.has_task? or c.has_taskid?)) or (c.has_date? or c.has_duration?) }
