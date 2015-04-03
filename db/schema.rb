@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 5) do
+ActiveRecord::Schema.define(version: 7) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,8 +26,10 @@ ActiveRecord::Schema.define(version: 5) do
   add_index "notes", ["notable_type", "notable_id"], name: "index_notes_on_notable_type_and_notable_id", using: :btree
 
   create_table "projects", force: :cascade do |t|
-    t.string "code"
-    t.string "name"
+    t.string  "code"
+    t.string  "name"
+    t.string  "external_system"
+    t.integer "external_project_id"
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -45,6 +47,7 @@ ActiveRecord::Schema.define(version: 5) do
     t.datetime "finished_at"
     t.text     "tags",        array: true
     t.integer  "task_id"
+    t.integer  "duration"
   end
 
   add_index "time_entries", ["task_id"], name: "index_time_entries_on_task_id", using: :btree

@@ -36,6 +36,7 @@ require "cuckoo/completer"
 require "cuckoo/context"
 require "cuckoo/timer"
 
+require "cuckoo/plugins"
 
 module Cuckoo
   class InputActor
@@ -111,7 +112,7 @@ module Cuckoo
     ################################################################################
 
     def load_config_file
-      load File.expand_path("~/.Cuckoofile")      
+     load File.expand_path("~/.Cuckoofile")      
     end
    
     def setup_db
@@ -129,6 +130,11 @@ module Cuckoo
     end
 
     def setup_api_connections
+      Cuckoo::Config.config.plugins.each do |name, plugin|
+        if plugin.respond_to? :sync_tasks
+          plugin.sync_tasks
+        end
+      end
     end
 
     def setup_context

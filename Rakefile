@@ -16,8 +16,6 @@ DatabaseTasks.migrations_paths = File.join(db_dir, 'migrate')
 task :environment do
   ActiveRecord::Base.configurations = DatabaseTasks.database_configuration
   ActiveRecord::Base.establish_connection DatabaseTasks.env
-  app = Cuckoo::App.new
-  include Cuckoo::Models
 end
  
 load 'active_record/railties/databases.rake'
@@ -30,6 +28,8 @@ end
 
 
 task :console => [:environment] do
+  app = Cuckoo::App.new
+  include Cuckoo::Models
   require 'irb'
   ARGV.clear
   IRB.start
