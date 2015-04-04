@@ -1,8 +1,11 @@
 module Cuckoo
   class Context
-    %w(cmd date project duration estimate task taskid queue timer time_entry).each do |attr|
+    %w(cmd date project duration estimate task queue timer time_entry).each do |attr|
       attr_accessor attr.to_sym
     end
+
+    attr_reader :tags
+    attr_reader :taskid
 
     def initialize
       @queue = Queue.new
@@ -15,8 +18,10 @@ module Cuckoo
       end
     end
 
-    def tags
-      @tags
+    def taskid=(val)
+      if val.is_a? String and val[0] == '#'
+        @taskid = val[1..-1]
+      end
     end
     
     def has_project?

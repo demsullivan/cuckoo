@@ -11,9 +11,9 @@ module Cuckoo
         @cmd_context    = args[:cmd_context]
         @update_context = args[:update_context]
 
-        unless @context.timer.nil?
-          puts "Timer already running."
-          return
+        unless @context.timer.nil? and @context.time_entry.nil?
+          @context.time_entry.finished_at = DateTime.now
+          @context.time_entry.save!
         end
 
         @context.timer = Timer.new(3600, true)
@@ -21,7 +21,7 @@ module Cuckoo
         @context.project = Project.find_or_create_by(:code => @cmd_context.project)
 
         if @cmd_context.has_taskid?
-          @context.task = @context.project.tasks.find(:external_task_id => @cmd_context.task_id)
+          @context.task = @context.project.tasks.where("tasks.external_task_id = :taskid", {taskid: @cmd_context.taskid}).first
         else
           @context.task = Task.new(:name => @cmd_context.task, :external_task_id => @cmd_context.taskid,
                                    :project => project, :estimate_seconds => @cmd_context.estimate)
@@ -42,8 +42,8 @@ module Cuckoo
 
         
         @update_context = true
-        
-        puts "Created task ##{@context.task.external_task_id} #{@context.task.name} on project #{@context.project.code}."
+
+        puts "Started timer for ##{@context.task.external_task_id} #{@context.task.name} on project #{@context.project.code}."
       end
     end
   end

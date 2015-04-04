@@ -91,6 +91,7 @@ module Cuckoo
               command.execute!
             rescue Exception => e
               puts e.message
+              raise
               next
             end
             

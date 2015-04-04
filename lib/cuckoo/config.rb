@@ -32,7 +32,7 @@ module Cuckoo
     attr_reader :config
 
     def plugin(plugin_name, &block)
-      require "cuckoo/#{plugin_name.to_s}"
+      require "cuckoo/plugins/#{plugin_name.to_s}"
       class_name = plugin_name.to_s.capitalize
       
       plugin_module       = Cuckoo.const_get(class_name)

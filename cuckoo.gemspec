@@ -37,6 +37,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "skywalker"
   spec.add_dependency "celluloid",        "0.16.0"
   spec.add_dependency "pg"
+  spec.add_dependency "pivotal-tracker"
+  spec.add_dependency "ruby-trello"
   
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"
