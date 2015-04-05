@@ -5,6 +5,13 @@ require 'cuckoo'
 
 include ActiveRecord::Tasks
 
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec)
+rescue LoadError
+  raise
+end
+
 db_dir = File.expand_path('../db', __FILE__)
 config_dir = File.expand_path('../config', __FILE__)
 
@@ -19,12 +26,6 @@ task :environment do
 end
  
 load 'active_record/railties/databases.rake'
-
-begin
-  require 'rspec/core/rake_task'
-  RSpec::Core::RakeTask.new(:spec)
-rescue LoadError
-end
 
 
 task :console => [:environment] do

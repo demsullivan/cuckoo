@@ -1,14 +1,11 @@
-require 'skywalker/command'
-
 module Cuckoo
   module Commands
-    class CreateCommand < Skywalker::Command
-      def execute!
-        puts cmd_context.cmd
-      end
+    class CreateCommand
 
-      private def required_args
-        %w(context cmd_context on_success on_failure)
+      attr_accessor :update_context
+
+      def call(args)
+        puts args[:cmd_context].cmd
       end
     end
   end
