@@ -18,20 +18,22 @@ module Cuckoo
       else
         @before = @text
       end
-      
-      subject  = Token.new(@text.split(' ').last)
 
+      tokens  = split_text.map { |word| Token.new(word) }
 
       [Taggers::Project, Taggers::Tag, Taggers::TaskId].each do |tok|
-        tok.scan [subject]
+        tok.scan(tokens)
       end
 
+      subject = tokens.last
+      
       if subject.tags.include? :project
         complete_project subject.word
       elsif subject.tags.include? :taskid or subject.word == '#'
         complete_task subject.word
       else
-        complete_task_by_name subject.word
+        @before = @text.sub(@context.task, '').rstrip
+        complete_task_by_name @context.task
       end
     end
 
